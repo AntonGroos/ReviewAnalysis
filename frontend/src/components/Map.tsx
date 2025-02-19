@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 import { sendReviewsToBackend } from "../services/api";
+import { sendPlacesToBackend } from "../services/api";
 
 const centerCoordinates = { lat: 48.137, lng: 11.576 }; // Munich, Germany
 const MAP_ID = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID as string;
@@ -56,7 +57,7 @@ const GoogleMapComponent: React.FC = () => {
           "marker"
         )) as google.maps.MarkerLibrary;
         const reviewsToSend = [];
-
+        const placesToSend: string[] = [];
         // Remove old markers
         markers.forEach((marker) => marker.setMap(null));
         setMarkers([]);
@@ -64,19 +65,8 @@ const GoogleMapComponent: React.FC = () => {
         for (const place of results) {
           if (!place.geometry?.location) continue;
 
-          const placeDetails = new placesLibrary.Place({ id: place.place_id });
-          await placeDetails.fetchFields({ fields: ["reviews"] });
-
-          if (placeDetails.reviews) {
-            const formattedReviews = placeDetails.reviews.map((review) => ({
-              author: review.authorAttribution?.displayName || "Unknown",
-              rating: review.rating,
-              text: review.text,
-              timestamp: review.publishedAt,
-              place_id: place.place_id,
-            }));
-
-            reviewsToSend.push(...formattedReviews);
+          if (place.place_id) {
+            placesToSend.push(place.place_id);
           }
 
           // Add new marker
@@ -88,13 +78,12 @@ const GoogleMapComponent: React.FC = () => {
 
           setMarkers((prevMarkers) => [...prevMarkers, marker]);
         }
-
-        if (reviewsToSend.length > 0) {
+        if (placesToSend.length > 0) {
           try {
-            await sendReviewsToBackend(reviewsToSend);
-            console.log("Reviews sent to backend");
+            await sendPlacesToBackend(placesToSend);
+            console.log("Places sent to backend");
           } catch (error) {
-            console.error("Error sending reviews:", error);
+            console.error("Error sending places:", error);
           }
         }
       }

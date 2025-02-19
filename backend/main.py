@@ -32,5 +32,14 @@ async def receive_reviews(reviews: List[Review]):
     print(f"Received {len(reviews)} reviews")  # Debugging
     return {"message": "Reviews received", "count": len(reviews)}
 
+@app.post("/places/")
+async def receive_places(places: List[str]):
+    """
+    Receive a place_id from frontend and process/store it.
+    """
+    # Here, you could add database storage logic
+    print(f"Received {len(places)} place ids. First one: {places[0]}")  # Debugging
+    return {"message": "Places received", "count": len(places)}
+
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

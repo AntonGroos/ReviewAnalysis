@@ -1,0 +1,27 @@
+Change the functionality of searching for reviews from the frontend to the backend
+
+Backend:
+
+Add review average over time
+
+perform outlier detection by creating a review vector fro each week (dimensions are the star ratings)
+
+add a blacklist of reviewers to exclude
+
+use documentIntelligence to scan menus and add benchmarking. Maybe callouts like "cheapest samosas in town"?
+
+add callouts like top 5% of restaurants in the search 
+
+suggest an dish to try using chatgpt and the reviews. Maybe add the price as well once menus are analyzed.
+
+Frontend:
+
+Add window to display information.
+
+Places should get a mini Card
+
+
+
+
+
+

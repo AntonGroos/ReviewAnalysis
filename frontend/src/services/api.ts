@@ -22,3 +22,14 @@ export const sendReviewsToBackend = async (reviews) => {
     throw error;
   }
 };
+
+export const sendPlacesToBackend = async (places) => {
+  try {
+    const response = await apiClient.post("/places/", places);
+    console.log("Server Response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error sending places:", error);
+    throw error;
+  }
+};
