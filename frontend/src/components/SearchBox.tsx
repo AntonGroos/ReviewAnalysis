@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 
 interface SearchBoxProps {
@@ -7,44 +7,39 @@ interface SearchBoxProps {
 
 const SearchBox: React.FC<SearchBoxProps> = ({ onResultsFound }) => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const maps = useMapsLibrary("places");
-  const [service, setService] =
-    useState<google.maps.places.PlacesService | null>(null);
+  const placesLibrary = useMapsLibrary("places");
 
   useEffect(() => {
-    if (!maps || !inputRef.current) return;
+    if (!placesLibrary || !inputRef.current) return;
 
-    const autoCompleteInstance = new maps.Autocomplete(inputRef.current);
-    autoCompleteInstance.addListener("place_changed", () => {
-      const place = autoCompleteInstance.getPlace();
-      if (place && place.geometry?.location) {
-        onResultsFound([place]); // Send single place as an array
-      }
-    });
+    const initSearchBox = async () => {
+      const { SearchBox } = (await google.maps.importLibrary(
+        "places"
+      )) as google.maps.places.PlacesLibrary;
+      const searchBox = new SearchBox(inputRef.current!);
 
-    setService(new maps.PlacesService(document.createElement("div")));
-  }, [maps]);
+      searchBox.addListener("places_changed", () => {
+        const results = searchBox.getPlaces();
+        if (results && results.length > 0) onResultsFound(results);
+      });
+    };
 
-  const handleSearch = () => {
-    if (!service || !inputRef.current?.value) return;
-
-    service.textSearch({ query: inputRef.current.value }, (results, status) => {
-      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-        onResultsFound(results); // Send multiple search results
-      }
-    });
-  };
+    initSearchBox();
+  }, [placesLibrary, onResultsFound]);
 
   return (
-    <div>
-      <input
-        ref={inputRef}
-        type="text"
-        placeholder="Search places..."
-        className="search-box"
-      />
-      <button onClick={handleSearch}>Search</button>
-    </div>
+    <input
+      ref={inputRef}
+      type="text"
+      placeholder="Search for a place..."
+      style={{
+        width: "300px",
+        padding: "10px",
+        borderRadius: "5px",
+        border: "1px solid #ccc",
+        fontSize: "16px",
+      }}
+    />
   );
 };
 
