@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
+from models import Review
 
 app = FastAPI()
 
@@ -14,14 +15,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Define a model for reviews
-class Review(BaseModel):
-    author: str
-    rating: float
-    text: str
-    timestamp: Optional[str] = None
-    place_id: str
 
 @app.post("/reviews/")
 async def receive_reviews(reviews: List[Review]):
